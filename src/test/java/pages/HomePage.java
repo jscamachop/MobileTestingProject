@@ -27,6 +27,6 @@ public class HomePage extends BasePage {
      * * @return true si el elemento está visible, false en caso contrario.
      */
     public boolean isHomeVisible() {
-        return isElementVisible(homeScreen); // 'driver' viene heredado de BasePage
+        return isElementVisible(homeScreen);
     }
 }

@@ -5,43 +5,28 @@ import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
 /**
- * Clase Page Object que representa la sección de Autenticación (Login y Sign Up).
- * Hereda de BasePage para utilizar esperas explícitas seguras.
+ * Clase Page Object exclusiva para el flujo de Inicio de Sesión (Login).
  */
 public class LoginPage extends BasePage {
 
-    // --- Localizadores de Login ---
+    //Localizadores exclusivos
     private By loginScreen = AppiumBy.accessibilityId("Login-screen");
+    private By tabLogin = AppiumBy.accessibilityId("button-login-container");
     private By inputEmail = AppiumBy.accessibilityId("input-email");
     private By inputPassword = AppiumBy.accessibilityId("input-password");
     private By btnLoginSubmit = AppiumBy.accessibilityId("button-LOGIN");
 
-    // --- Localizadores de Sign Up ---
-    private By tabSignUp = AppiumBy.accessibilityId("button-sign-up-container");
-    private By inputRepeatPassword = AppiumBy.accessibilityId("input-repeat-password");
-    private By btnSignUpSubmit = AppiumBy.accessibilityId("button-SIGN UP");
+    //Localizadores de Alertas
+    private By alertTitle = AppiumBy.xpath("//*[@text='Success']");
+    private By alertOkButton = AppiumBy.xpath("//*[@text='OK']");
 
-    // --- Localizadores del Pop-up
-    private By alertTitle = AppiumBy.xpath("//android.widget.TextView[@text='Signed Up!']");
-    private By alertOkButton = AppiumBy.xpath("//android.widget.Button[@text='OK']");
+    public LoginPage(AndroidDriver driver) { super(driver); }
 
-    /**
-     * Constructor de la clase LoginPage.
-     *
-     * @param driver Instancia del AndroidDriver inyectada desde la prueba.
+    //Métodos de Validación
+    public boolean isLoginScreenVisible() { return isElementVisible(loginScreen); }
+
+    /** * Valida si el botón de Login está habilitado (Requerido por NavigationTest).
      */
-    public LoginPage(AndroidDriver driver) {
-        super(driver);
-    }
-
-    // --- Métodos de Validación Inicial ---
-
-    /** Valida si la pantalla de Login está visible. */
-    public boolean isLoginScreenVisible() {
-        return isElementVisible(loginScreen);
-    }
-
-    /** Valida si el botón de hacer submit en el Login está habilitado. */
     public boolean isLoginButtonEnabled() {
         if (isElementVisible(btnLoginSubmit)) {
             return driver.findElement(btnLoginSubmit).isEnabled();
@@ -49,48 +34,13 @@ public class LoginPage extends BasePage {
         return false;
     }
 
+    //Métodos de Acción
+    public void goToLoginTab() { clickElement(tabLogin); }
+    public void enterEmail(String email) { typeText(inputEmail, email); }
+    public void enterPassword(String password) { typeText(inputPassword, password); }
+    public void clickLoginButton() { clickElement(btnLoginSubmit); }
 
-    /** Hace clic en la pestaña "Sign up" en la parte superior de la pantalla. */
-    public void goToSignUpTab() {
-        clickElement(tabSignUp);
-    }
-
-    // --- Métodos de Acción: Formularios ---
-
-    /** Ingresa el correo electrónico. */
-    public void enterEmail(String email) {
-        typeText(inputEmail, email);
-    }
-
-    /** Ingresa la contraseña. */
-    public void enterPassword(String password) {
-        typeText(inputPassword, password);
-    }
-
-    /** Ingresa la confirmación de la contraseña (solo para Sign Up). */
-    public void enterRepeatPassword(String password) {
-        typeText(inputRepeatPassword, password);
-    }
-
-    /** Hace clic en el botón principal de Login. */
-    public void clickLoginButton() {
-        clickElement(btnLoginSubmit);
-    }
-
-    /** Hace clic en el botón principal de Sign Up. */
-    public void clickSignUpSubmitButton() {
-        clickElement(btnSignUpSubmit);
-    }
-
-    /** * Obtiene el título de la alerta nativa de Android que aparece al tener éxito.
-     * @return El texto del título de la alerta.
-     */
-    public String getAlertTitleText() {
-        return getText(alertTitle);
-    }
-
-    /** Hace clic en el botón OK de la alerta nativa para cerrarla. */
-    public void acceptAlert() {
-        clickElement(alertOkButton);
-    }
+    //Métodos de Alertas
+    public String getAlertTitleText() { return getText(alertTitle); }
+    public void acceptAlert() { clickElement(alertOkButton); }
 }
