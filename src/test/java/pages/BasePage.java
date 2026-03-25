@@ -27,7 +27,6 @@ public class BasePage {
      */
     public BasePage(AndroidDriver driver) {
         this.driver = driver;
-        // Creamos la regla de espera explícita (máximo 10 segundos)
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
@@ -35,8 +34,6 @@ public class BasePage {
 
     /**
      * Método genérico que usa Espera Explícita para verificar si un elemento es visible.
-     * Atrapa el error si el tiempo se agota, devolviendo un 'false' limpio
-     * ideal para usar con Asserts, evitando que el código explote bruscamente.
      *
      * @param locator El localizador (By) del elemento a buscar.
      * @return true si el elemento se hace visible a tiempo, false si se agota el tiempo.
@@ -52,11 +49,33 @@ public class BasePage {
 
     /**
      * Método genérico que usa Espera Explícita para hacer clic.
-     * Se asegura de que el elemento no solo exista, sino que sea "clickeable".
      *
      * @param locator El localizador (By) del elemento a clickear.
      */
     protected void clickElement(By locator) {
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+    }
+
+    /**
+     * Método genérico que usa Espera Explícita para escribir texto en un campo.
+     * Limpia el campo antes de escribir para evitar errores.
+     *
+     * @param locator El localizador (By) del campo de texto.
+     * @param text El texto que se desea ingresar.
+     */
+    protected void typeText(By locator, String text) {
+        var element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    /**
+     * Método genérico que usa Espera Explícita para obtener el texto de un elemento.
+     *
+     * @param locator El localizador (By) del elemento.
+     * @return El texto visible del elemento.
+     */
+    protected String getText(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
     }
 }
