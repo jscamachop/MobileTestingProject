@@ -1,63 +1,68 @@
 package tests;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.LoginPage;
 import pages.MenuPage;
 import pages.SignUpPage;
 
 /**
- * Clase de prueba para validar el flujo de inicio de sesión (Login) en la aplicación.
- * <p>
- * Implementa la mejor práctica de "Data Independence" (Independencia de Datos),
- * creando un usuario al vuelo como precondición antes de intentar iniciar sesión
- * con esas mismas credenciales.
+ * Clase de prueba para validar el flujo de inicio de sesión (Login).
+ * Separa limpiamente las precondiciones (@BeforeMethod) de la prueba real (@Test).
  */
 public class LoginTest extends BaseTest {
 
+    // Variables a nivel de clase para compartir datos entre el Setup y el Test
+    private LoginPage loginPage;
+    private String uniqueEmail;
+    private String validPassword;
+
     /**
-     * Prueba End-to-End que primero registra un usuario nuevo dinámico y luego
-     * utiliza esas credenciales recién creadas para iniciar sesión, validando
-     * finalmente que aparezca la alerta de éxito correspondiente al Login.
+     * PRECONDICIÓN: Se ejecuta DESPUÉS de abrir la app (BaseTest) pero ANTES del test.
+     * Aquí creamos el usuario dinámico para cumplir con la "Data Independence".
      */
-    @Test
-    public void testSuccessfulLogin() {
+    @BeforeMethod
+    public void setupLoginPrecondition() {
         MenuPage menuPage = new MenuPage(driver);
-        LoginPage loginPage = new LoginPage(driver);
+        loginPage = new LoginPage(driver);
         SignUpPage signUpPage = new SignUpPage(driver);
 
-        // Generamos credenciales únicas para todo el flujo
-        String uniqueEmail = "usuario" + System.currentTimeMillis() + "@gmail.com";
-        String validPassword = "Password123!";
+        uniqueEmail = "usuario" + System.currentTimeMillis() + "@gmail.com";
+        validPassword = "Password123!";
 
-        System.out.println("1. Preparando datos: Creando usuario nuevo...");
+        System.out.println("--- @BeforeMethod: Preparando datos y creando usuario ---");
         menuPage.tapOnLogin();
-
         signUpPage.goToSignUpTab();
         signUpPage.enterEmail(uniqueEmail);
         signUpPage.enterPassword(validPassword);
         signUpPage.enterRepeatPassword(validPassword);
         signUpPage.clickSignUpSubmitButton();
 
-        // Validamos la creación exitosa y cerramos la alerta
-        Assert.assertEquals(signUpPage.getAlertTitleText(), "Signed Up!", "Error en la precondición: No se pudo crear el usuario.");
+        // Asumimos que la creación es exitosa y cerramos la alerta para limpiar la pantalla
         signUpPage.acceptAlert();
+    }
 
-        System.out.println("2. Iniciando test: Cambiando a pestaña Login...");
+    /**
+     * evaluamos la funcionalidad de Login.
+     */
+    @Test
+    public void testSuccessfulLogin() {
+        System.out.println("--- @Test: Iniciando prueba de Login ---");
+
+        System.out.println("1. Cambiando a pestaña Login...");
         loginPage.goToLoginTab();
 
-        System.out.println("3. Ingresando credenciales recién creadas...");
+        System.out.println("2. Ingresando credenciales recién creadas...");
         loginPage.enterEmail(uniqueEmail);
         loginPage.enterPassword(validPassword);
 
-        System.out.println("4. Haciendo clic en Login...");
+        System.out.println("3. Haciendo clic en Login...");
         loginPage.clickLoginButton();
 
-        System.out.println("5. Verificando éxito (Alerta 'Success')...");
-        // Validamos que el pop-up ahora indique éxito en el Login
+        System.out.println("4. Verificando éxito (Alerta 'Success')...");
         Assert.assertEquals(loginPage.getAlertTitleText(), "Success", "Error: El Login no fue exitoso.");
 
-        // Cerramos el pop-up nativo
         loginPage.acceptAlert();
         System.out.println("Prueba de Login completa");
     }

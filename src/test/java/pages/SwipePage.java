@@ -5,13 +5,18 @@ import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
 /**
- * Clase Page Object que representa la pantalla de Swipe.
- * Hereda de BasePage para reutilizar la instancia del driver y mantener una arquitectura limpia.
+ * Clase que representa la pantalla de Swipe.
  */
 public class SwipePage extends BasePage {
 
-    /** Localizador del contenedor principal de la pantalla Swipe. */
+
     private By swipeScreen = AppiumBy.accessibilityId("Swipe-screen");
+
+
+    private By firstCard = AppiumBy.xpath("//*[@text='FULLY OPEN SOURCE']");
+    private By lastCard = AppiumBy.xpath("//*[@text='COMPATIBLE']");
+
+    private By hiddenText = AppiumBy.xpath("//*[@text='You found me!!!']");
 
     /**
      * Constructor de la clase SwipePage.
@@ -30,5 +35,32 @@ public class SwipePage extends BasePage {
      */
     public boolean isSwipeScreenVisible() {
         return isElementVisible(swipeScreen);
+    }
+
+    public void swipeToNextCard() {
+        swipeLeft();
+    }
+
+    public void scrollToHiddenText() {
+        scrollDownFromTop();
+
+        int maxScrolls = 5;
+        while (!isElementPresentFast(hiddenText) && maxScrolls > 0) {
+            scrollDownFromBottom();
+            maxScrolls--;
+        }
+    }
+
+
+    public boolean isFirstCardHidden() {
+        return isElementHidden(firstCard);
+    }
+
+    public boolean isLastCardVisible() {
+        return isElementVisible(lastCard);
+    }
+
+    public boolean isHiddenTextVisible() {
+        return isElementVisible(hiddenText);
     }
 }
